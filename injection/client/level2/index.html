@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Level 2 Injection CTF">
+    <title>Level 2 Injection CTF</title>
+    <link rel="stylesheet" href="../static/bulma.min.css">
+    <script src="../static/alpine.min.js" defer></script>
+    <style>
+        .section {
+            padding: 1.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body x-data="page()">
+<section class="section">
+    <div class="columns">
+        <div class="column is-10">
+            <p class="subtitle is-4"><strong>Netflix Title Search:</strong></p>
+            <div class="field has-addons">
+                <div class="control" style="width:100%">
+                    <input type="text" class="input" x-model="searchQuery" placeholder="Enter Query">
+                </div>
+                <div class="control">
+                    <a class="button is-info" @click="search()">Search</a>
+                </div>
+            </div>
+        </div>
+        <div class="column is-2">
+            <button class="button level-item" @click="gotoLogin()">
+                Admin Login
+            </button>
+        </div>
+    </div>
+</section>
+<template x-if="showNotification">
+    <section class="section">
+        <div class="notification is-danger">
+            <button class="delete" @click="closeNotification()"></button>
+            <span x-text="notificationMessage"></span>
+        </div>
+    </section>
+</template>
+<template x-if="searchResults.length > 0">
+<section class="section">
+    <div class="box">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Rating</th>
+                <th>Year</th>
+                <th>Duration</th>
+                <th>Title</th>
+            </tr>
+            </thead>
+            <tbody>
+            <template x-for="item in searchResults" :key="item">
+                <tr>
+                    <td x-text="item.id"></td>
+                    <td x-text="item.type"></td>
+                    <td x-text="item.rating"></td>
+                    <td x-text="item.year"></td>
+                    <td x-text="item.duration"></td>
+                    <th x-text="item.title"></th>
+                </tr>
+            </template>
+            </tbody>
+        </table>
+    </div>
+</section>
+</template>
+</body>
+<script>
+    async function postData(url = '', data = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    function page() {
+        return {
+            searchResults: [],
+            searchQuery: '',
+            notificationMessage: '',
+            showNotification: false,
+            closeNotification: function()
+            {
+                this.showNotification = false;
+            },
+            search: async function()
+            {
+                const results = await postData('./search', {query: this.searchQuery});
+                if (results.status === 'success')
+                {
+                    this.searchResults = results.data;
+                }
+                else
+                {
+                    this.searchResults = [];
+                    this.notificationMessage = results.message;
+                    this.showNotification = true;
+                }
+            },
+            gotoLogin: function() {
+                window.location.href = './login.html';
+            }
+        }
+    }
+</script>
+</html>

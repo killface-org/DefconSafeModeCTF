@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Level 5 Injection CTF">
+    <title>Level 5 Injection CTF</title>
+    <link rel="stylesheet" href="../static/bulma.min.css">
+    <script src="../static/alpine.min.js" defer></script>
+    <style>
+        .section {
+            padding: 1.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body x-data="page()" x-init="() => { getAnimalList(); }">
+<template x-if="showNotification">
+    <div class="notification is-danger">
+        <button class="delete" @click="closeNotification()"></button>
+        <span x-text="notificationMessage"></span>
+    </div>
+</template>
+<section class="section">
+    <div class="level">
+        <div class="level-item">
+            <div class="buttons">
+                <template x-for="animal in animalList" :key="animal">
+                    <button class="button" x-text="animal" @click="loadPictures(animal)"></button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+</section>
+<section class="section">
+        <template x-for="pic in pictureList" :key="pic">
+            <div class="box" style="display:inline-block; width: 30%">
+                <figure class="image">
+                    <img x-bind:src="pic" alt="Placeholder image">
+                </figure>
+            </div>
+        </template>
+</section>
+</body>
+<script>
+    async function postData(url = '', data = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    function page() {
+        return {
+            animalList: [],
+            pictureList: [],
+            notificationMessage: '',
+            showNotification: false,
+            closeNotification: function()
+            {
+                this.showNotification = false;
+            },
+            getAnimalList: async function()
+            {
+                const result = await postData('./getAnimalList', {});
+                if (result.status === 'success')
+                {
+                    this.animalList = result.data;
+                }
+                else
+                {
+                    this.notificationMessage = result.message;
+                    this.showNotification = true;
+                }
+            },
+            loadPictures: async function(animal)
+            {
+                const result = await postData('./getPictureList', {name: animal});
+                if (result.status === 'success')
+                {
+                    this.pictureList = result.data.map((pic) => {
+                        return `./animals/${animal}/${pic}`;
+                    });
+                }
+                else
+                {
+                    this.notificationMessage = result.message;
+                    this.showNotification = true;
+                }
+            }
+        }
+    }
+</script>
+</html>

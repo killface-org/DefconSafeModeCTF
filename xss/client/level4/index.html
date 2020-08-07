@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Level 4 XSS CTF">
+    <title>Level 4 XSS CTF</title>
+    <link rel="stylesheet" href="../static/bulma.min.css">
+    <script src="../static/alpine.min.js" defer></script>
+    <style>
+        .section {
+            padding: 1.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body x-data="page()">
+<section class="section">
+    <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+            <article class="panel is-info">
+                <p class="panel-heading">
+                    Login
+                </p>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input" type="text" placeholder="Username" x-model="username">
+                    </p>
+                </div>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input" type="password" placeholder="Password" x-model="password">
+                    </p>
+                </div>
+                <div class="panel-block" style="display:block">
+                    <div class="level">
+                        <div class="level-left">
+                            <button class="button level-item" @click="login()">
+                                Login
+                            </button>
+                        </div>
+                        <div class="level-right">
+                            <button class="button level-item" @click="gotoPage('create.html')">
+                                Register
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <template x-if="showNotification">
+                <div class="notification is-danger">
+                    <button class="delete" @click="closeNotification()"></button>
+                    Invalid login
+                </div>
+            </template>
+        </div>
+    </div>
+</section>
+</body>
+<script>
+    async function postData(url = '', data = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    function page() {
+        return {
+            username: '',
+            password: '',
+            showNotification: false,
+            closeNotification: function()
+            {
+                this.showNotification = false;
+            },
+            gotoPage: function(pageName)
+            {
+                window.location.href = `./${pageName}`;
+            },
+            login: async function() {
+                const loginResult = await postData('./login', { username: this.username, password: this.password});
+                if (loginResult.status === 'success')
+                {
+                    this.gotoPage('./app.html');
+                }
+                else
+                {
+                    this.showNotification = true;
+                }
+            }
+        }
+    }
+</script>
+</html>

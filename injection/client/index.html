@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Injection CTF">
+    <title>Injection CTF</title>
+    <link rel="stylesheet" href="./static/bulma.min.css">
+    <script src="./static/alpine.min.js" defer></script>
+    <style>
+        html {
+            background-color: lightgray;
+        }
+        .section {
+            padding: 0.5rem 1.5rem;
+        }
+        .pre-code {
+            padding: 0.5rem 0.5rem;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body x-data="page()">
+<nav class="level">
+    <div class="level-item">
+        <h1 class="title is-1">Injection Challenges</h1>
+    </div>
+</nav>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 1</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Login as the admin user.
+                    <br>
+                    <b>Hints: </b>SQL(SELECT, Comments), SQLite3
+                </h4>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-full">
+                <b>Relevant Server Source Code</b>
+                <div>
+<pre style="color:#d1d1d1;background:#000000;">async <span style="color:#e66170; font-weight:bold; ">function</span> authenticateUser<span style="color:#d2cd86; ">(</span>user<span style="color:#d2cd86; ">,</span> pass<span style="color:#d2cd86; ">)</span>
+<span style="color:#b060b0; ">{</span>
+    <span style="color:#e66170; font-weight:bold; ">try</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#d2cd86; ">(</span>await db<span style="color:#d2cd86; ">.</span>raw<span style="color:#d2cd86; ">(</span><span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">SELECT * FROM users WHERE username = '</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">user</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; ">' AND password = '</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">pass</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; ">'</span><span style="color:#02d045; ">`</span><span style="color:#d2cd86; ">)</span><span style="color:#d2cd86; ">)</span><span style="color:#d2cd86; ">[</span><span style="color:#008c00; ">0</span><span style="color:#d2cd86; ">]</span><span style="color:#b060b0; ">;</span>
+    <span style="color:#b060b0; ">}</span>
+    <span style="color:#e66170; font-weight:bold; ">catch</span><span style="color:#d2cd86; ">(</span>err<span style="color:#d2cd86; ">)</span> <span style="color:#b060b0; ">{</span><span style="color:#b060b0; ">}</span>
+<span style="color:#b060b0; ">}</span>
+</pre>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(1);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 2</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Login as the admin user.
+                    <br>
+                    <b>Hints: </b>SQL(SELECT, UNION, Comments), SQLite3
+                </h4>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-full">
+                <b>Relevant Server Source Code</b>
+                <div>
+<pre style="color:#d1d1d1;background:#000000;">async <span style="color:#e66170; font-weight:bold; ">function</span> <span style="color:#e66170; font-weight:bold; ">search</span><span style="color:#d2cd86; ">(</span>query<span style="color:#d2cd86; ">)</span>
+<span style="color:#b060b0; ">{</span>
+    <span style="color:#e66170; font-weight:bold; ">try</span> <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">const</span> searchResults <span style="color:#d2cd86; ">=</span> await db<span style="color:#d2cd86; ">.</span>raw<span style="color:#d2cd86; ">(</span>
+            <span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">SELECT id, type, title, year, rating, duration FROM netflix WHERE title LIKE '%</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">query</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; ">%' ORDER BY title LIMIT 100</span><span style="color:#02d045; ">`</span><span style="color:#d2cd86; ">)</span><span style="color:#b060b0; ">;</span>
+
+        <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+            status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">success</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+            data<span style="color:#b060b0; ">:</span> searchResults
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+    <span style="color:#e66170; font-weight:bold; ">catch</span><span style="color:#d2cd86; ">(</span>err<span style="color:#d2cd86; ">)</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+            status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">failed</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+            message<span style="color:#b060b0; ">:</span> err<span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">toString</span><span style="color:#d2cd86; ">(</span><span style="color:#d2cd86; ">)</span>
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+<span style="color:#b060b0; ">}</span>
+</pre>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(2);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 3</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Login as the admin user.
+                    <br>
+                    <b>Hints: </b>SQL(SELECT, Comments, Concatenation), SQLite3
+                </h4>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-full">
+                <b>Relevant Server Source Code</b>
+                <div>
+<pre style="color:#d1d1d1;background:#000000;">async <span style="color:#e66170; font-weight:bold; ">function</span> createUser<span style="color:#d2cd86; ">(</span>username<span style="color:#d2cd86; ">,</span> password<span style="color:#d2cd86; ">)</span>
+<span style="color:#b060b0; ">{</span>
+    username <span style="color:#d2cd86; ">=</span> username<span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">toLowerCase</span><span style="color:#d2cd86; ">(</span><span style="color:#d2cd86; ">)</span><span style="color:#b060b0; ">;</span>
+    <span style="color:#e66170; font-weight:bold; ">try</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#9999a9; ">//Check to see if user already exists.</span>
+        <span style="color:#e66170; font-weight:bold; ">const</span> result <span style="color:#d2cd86; ">=</span> <span style="color:#d2cd86; ">(</span>await db<span style="color:#d2cd86; ">.</span>raw<span style="color:#d2cd86; ">(</span><span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">SELECT id, name FROM users WHERE name = '</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">username</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; ">'</span><span style="color:#02d045; ">`</span><span style="color:#d2cd86; ">)</span><span style="color:#d2cd86; ">)</span><span style="color:#d2cd86; ">[</span><span style="color:#008c00; ">0</span><span style="color:#d2cd86; ">]</span><span style="color:#b060b0; ">;</span>
+        <span style="color:#e66170; font-weight:bold; ">if</span> <span style="color:#d2cd86; ">(</span>result<span style="color:#d2cd86; ">)</span>
+        <span style="color:#b060b0; ">{</span>
+            <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+                status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">failed</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+                message<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">User </span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">result</span><span style="color:#d2cd86; ">.</span><span style="color:#00c4c4; ">name</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; "> already exists</span><span style="color:#02d045; ">`</span>
+            <span style="color:#b060b0; ">}</span>
+        <span style="color:#b060b0; ">}</span>
+        <span style="color:#e66170; font-weight:bold; ">else</span>
+        <span style="color:#b060b0; ">{</span>
+            <span style="color:#9999a9; ">//Add user to database.</span>
+            await db<span style="color:#d2cd86; ">.</span>raw<span style="color:#d2cd86; ">(</span><span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">INSERT INTO users (name, password) VALUES ('</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">username</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; ">','</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">password</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; ">')</span><span style="color:#02d045; ">`</span><span style="color:#d2cd86; ">)</span><span style="color:#b060b0; ">;</span>
+            <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+                status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">success</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+                message<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">Created </span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">username</span><span style="color:#02d045; ">}</span><span style="color:#02d045; ">`</span>
+            <span style="color:#b060b0; ">}</span>
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+    <span style="color:#e66170; font-weight:bold; ">catch</span><span style="color:#d2cd86; ">(</span>err<span style="color:#d2cd86; ">)</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+            status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">failed</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+            message<span style="color:#b060b0; ">:</span> err<span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">toString</span><span style="color:#d2cd86; ">(</span><span style="color:#d2cd86; ">)</span>
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+<span style="color:#b060b0; ">}</span>
+</pre>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(3);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 4</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Login as the admin user.
+                    <br>
+                    <b>Hints: </b>The password only contains the lowercase characters a through z.
+                </h4>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-full">
+                <b>Relevant Server Source Code</b>
+                <div>
+<pre style="color:#d1d1d1;background:#000000;">async <span style="color:#e66170; font-weight:bold; ">function</span> isValidUser<span style="color:#d2cd86; ">(</span>username<span style="color:#d2cd86; ">)</span>
+<span style="color:#b060b0; ">{</span>
+    <span style="color:#e66170; font-weight:bold; ">try</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">const</span> user <span style="color:#d2cd86; ">=</span> <span style="color:#d2cd86; ">(</span>await db<span style="color:#d2cd86; ">.</span>raw<span style="color:#d2cd86; ">(</span><span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">SELECT id, name, password FROM users WHERE name = '</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">username</span><span style="color:#02d045; ">}</span><span style="color:#00c4c4; ">'</span><span style="color:#02d045; ">`</span><span style="color:#d2cd86; ">)</span><span style="color:#d2cd86; ">)</span><span style="color:#d2cd86; ">[</span><span style="color:#008c00; ">0</span><span style="color:#d2cd86; ">]</span><span style="color:#b060b0; ">;</span>
+        <span style="color:#e66170; font-weight:bold; ">if</span> <span style="color:#d2cd86; ">(</span>user<span style="color:#d2cd86; ">)</span>
+        <span style="color:#b060b0; ">{</span>
+            <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span> status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">success</span><span style="color:#02d045; ">'</span> <span style="color:#b060b0; ">}</span><span style="color:#b060b0; ">;</span>
+        <span style="color:#b060b0; ">}</span>
+        <span style="color:#e66170; font-weight:bold; ">else</span>
+        <span style="color:#b060b0; ">{</span>
+            <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span> status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">failed</span><span style="color:#02d045; ">'</span> <span style="color:#b060b0; ">}</span><span style="color:#b060b0; ">;</span>
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+    <span style="color:#e66170; font-weight:bold; ">catch</span><span style="color:#d2cd86; ">(</span>err<span style="color:#d2cd86; ">)</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+            status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">error</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+            message<span style="color:#b060b0; ">:</span> err<span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">toString</span><span style="color:#d2cd86; ">(</span><span style="color:#d2cd86; ">)</span>
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+<span style="color:#b060b0; ">}</span>
+</pre>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(4);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 5</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Obtain a reverse shell, and get the flag from level5flag.txt
+                    <br>
+                    <b>Hints: </b>Alpine Linux(ls, cat, nc)
+                </h4>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-full">
+                <b>Relevant Server Source Code</b>
+                <div>
+<pre style="color:#d1d1d1;background:#000000;">async <span style="color:#e66170; font-weight:bold; ">function</span> getPictureList<span style="color:#d2cd86; ">(</span>animalName<span style="color:#d2cd86; ">)</span>
+<span style="color:#b060b0; ">{</span>
+    <span style="color:#e66170; font-weight:bold; ">try</span> <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">const</span> cmdResult <span style="color:#d2cd86; ">=</span> await execPromise<span style="color:#d2cd86; ">(</span><span style="color:#02d045; ">`</span><span style="color:#00c4c4; ">ls ./client/level5/animals/</span><span style="color:#02d045; ">${</span><span style="color:#00c4c4; ">animalName</span><span style="color:#02d045; ">}</span><span style="color:#02d045; ">`</span><span style="color:#d2cd86; ">)</span><span style="color:#b060b0; ">;</span>
+        <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+            status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">success</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+            data<span style="color:#b060b0; ">:</span> cmdResult<span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">split</span><span style="color:#d2cd86; ">(</span><span style="color:#02d045; ">'</span><span style="color:#008080; ">\n</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">)</span><span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">slice</span><span style="color:#d2cd86; ">(</span><span style="color:#008c00; ">0</span><span style="color:#d2cd86; ">,</span><span style="color:#d2cd86; ">-</span><span style="color:#008c00; ">1</span><span style="color:#d2cd86; ">)</span>
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+    <span style="color:#e66170; font-weight:bold; ">catch</span> <span style="color:#d2cd86; ">(</span>err<span style="color:#d2cd86; ">)</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">return</span> <span style="color:#b060b0; ">{</span>
+            status<span style="color:#b060b0; ">:</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">failed</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">,</span>
+            message<span style="color:#b060b0; ">:</span> err<span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">toString</span><span style="color:#d2cd86; ">(</span><span style="color:#d2cd86; ">)</span>
+        <span style="color:#b060b0; ">}</span>
+    <span style="color:#b060b0; ">}</span>
+<span style="color:#b060b0; ">}</span>
+</pre>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(5);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+<script>
+function page() {
+    return {
+        gotoLevel: function(level) {
+            window.open(`./level${level}`, '_blank');
+        }
+    }
+}
+</script>
+</html>

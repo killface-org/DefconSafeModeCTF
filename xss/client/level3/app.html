@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Level 3 XSS App">
+    <title>Level 3 XSS App</title>
+    <link rel="stylesheet" href="../static/bulma.min.css">
+    <script src="../static/alpine.min.js" defer></script>
+    <style>
+        .section {
+            padding: 1.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body x-data="app()" x-init="() => { initApp(); }">
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" style="background-color: gray">
+    <div id="navbarBasicExample" class="navbar-menu is-active">
+        <div class="navbar-start">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <button class="button is-info ir is-rounded" @click="createNewPost()">
+                        <strong>New Post</strong>
+                    </button>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <p class="title is-4">Logged is as @<span x-ref="usernameHeader"></span></p>
+            </div>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-light" href="./logout">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<section class="section" style="background-color: lightgray">
+    <div class="container" style="margin-top:60px">
+        <template x-for="(post, index) in posts" :key="index">
+            <!-- You can also reference "index" inside the iteration if you need. -->
+            <div class="card" style="margin-top: 7.5px;margin-bottom: 7.5px;border-radius: 5px">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-content">
+                            <p class="title is-4"><span x-text="post.name"></span>
+                                <template x-if="post.admin===1">
+                                    <img src="./admin.png" title="Admin User" style="height:25px; vertical-align: bottom">
+                                </template>
+                            </p>
+                            <p class="subtitle is-6"><i>@<span x-text="post.username"></span></i></p>
+                        </div>
+                    </div>
+
+                    <div class="content" x-html="post.post_data">
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</section>
+<div class="modal" x-bind:class="{'is-active':postModalActive}">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <div class="modal-card-title">
+                <p class="title is-4">Create New Post</p>
+                <p class="subtitle is-6"><i>All posts are private by default.</i></p>
+            </div>
+            <button class="delete" aria-label="close" @click="setPostModalActive(false)"></button>
+        </header>
+        <section class="modal-card-body">
+            <textarea class="textarea" placeholder="What do you want to say?" rows="10" x-ref="postData"></textarea>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" @click="publishPost">Publish</button>
+            <button class="button" @click="setPostModalActive(false)">Cancel</button>
+            <label class="checkbox">
+                <input type="checkbox" x-ref="isPublicPost">
+                Make Public
+            </label>
+        </footer>
+    </div>
+</div>
+</body>
+<script>
+    async function postData(url = '', data = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    async function publishPost(content, isPublic)
+    {
+        return await postData('./publish', {
+            post: content,
+            public: isPublic
+        });
+    }
+
+    const POST_DISPLAY_LIMIT = 25;
+    let lastPostID = 0;
+
+    function app() {
+        return {
+            posts: [],
+            userInfo: {},
+            postModalActive: false,
+            initApp: async function()
+            {
+                this.userInfo = await postData('./userInfo');
+                this.$refs.usernameHeader.innerText = this.userInfo.user;
+                await this.pollData();
+                setInterval(async () => {
+                    await this.pollData();
+                }, 5000);
+            },
+            updatePagePosts: function(items)
+            {
+                lastPostID = items[0].id;
+                items.reverse();
+                for (let i = 0; i < items.length; i++)
+                {
+                    if (this.posts.length >= POST_DISPLAY_LIMIT)
+                    {
+                        this.posts.pop();
+                    }
+                    this.posts.unshift(items[i]);
+                }
+            },
+            pollData: async function()
+            {
+                const posts = await postData('./posts', {lastid: lastPostID});
+                if (posts.status === 'success')
+                {
+                    if (posts.data.length > 0)
+                    {
+                        this.updatePagePosts(posts.data);
+                    }
+                }
+                else
+                {
+                    console.error(posts.message);
+                }
+            },
+            setPostModalActive: function(state)
+            {
+                this.postModalActive = state;
+            },
+            createNewPost: async function()
+            {
+                this.setPostModalActive(true);
+            },
+            publishPost: async function()
+            {
+                const result = await publishPost(
+                    this.$refs.postData.value,
+                    this.$refs.isPublicPost.checked
+                );
+                if (result.status === 'success')
+                {
+                    this.$refs.postData.value = '';
+                    this.$refs.isPublicPost.checked = false;
+                    await this.pollData();
+                    this.setPostModalActive(false);
+                }
+                else
+                {
+                    console.error(result.message);
+                }
+            }
+        }
+    }
+</script>
+</html>

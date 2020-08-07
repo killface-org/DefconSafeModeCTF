@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Level 5 Reset Password">
+    <title>Level 5 Reset Password</title>
+    <link rel="stylesheet" href="../static/bulma.min.css">
+    <script src="../static/alpine.min.js" defer></script>
+    <style>
+        .section {
+            padding: 1.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body x-data="page()">
+<section class="section">
+    <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+            <article class="panel is-info">
+                <p class="panel-heading">
+                    Request Password Reset
+                </p>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input" type="text" placeholder="Username" x-model="username">
+                    </p>
+                </div>
+                <div class="panel-block">
+                    <button class="button level-item" @click="requestReset()">
+                        Send Link
+                    </button>
+                </div>
+            </article>
+            <template x-if="showNotification">
+                <div class="notification is-danger">
+                    <button class="delete" @click="closeNotification()"></button>
+                    <span x-text="notificationMessage"></span>
+                </div>
+            </template>
+            <template x-if="showLinkNotification">
+                <div class="notification is-info">
+                    <button class="delete" @click="closeLinkNotification()"></button>
+                    <a x-bind:href="linkNotificationMessage">Normally this would be sent through an e-mail.</a>
+                </div>
+            </template>
+        </div>
+    </div>
+</section>
+</body>
+<script>
+    async function postData(url = '', data = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    function page() {
+        return {
+            username: '',
+            showNotification: false,
+            showLinkNotification: false,
+            notificationMessage:'',
+            linkNotificationMessage:'',
+            closeNotification: function()
+            {
+                this.showNotification = false;
+            },
+            closeLinkNotification: function()
+            {
+                this.showLinkNotification = false;
+            },
+            requestReset: async function() {
+                const result = await postData('./requestreset', {username: this.username});
+                if (result.status === 'success')
+                {
+                    this.linkNotificationMessage = result.message;
+                    this.closeNotification();
+                    this.showLinkNotification = true;
+                }
+                else
+                {
+                    this.notificationMessage = result.message;
+                    this.closeLinkNotification();
+                    this.showNotification = true;
+                }
+            }
+        }
+    }
+</script>
+</html>

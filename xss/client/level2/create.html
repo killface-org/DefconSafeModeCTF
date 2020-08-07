@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Level 2 XSS Create User">
+    <title>Level 2 XSS Create User</title>
+    <link rel="stylesheet" href="../static/bulma.min.css">
+    <script src="../static/alpine.min.js" defer></script>
+    <style>
+        .section {
+            padding: 1.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body x-data="page()">
+<section class="section">
+    <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+            <article class="panel is-info">
+                <p class="panel-heading">
+                    New User
+                </p>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input" type="text" placeholder="Username" x-model="username">
+                    </p>
+                </div>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input" type="text" placeholder="Name" x-model="name">
+                    </p>
+                </div>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input" type="password" placeholder="Password" x-model="password">
+                    </p>
+                </div>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input" type="password" placeholder="Confirm Password" x-model="confirmPassword">
+                    </p>
+                </div>
+                <div class="panel-block">
+                    <button class="button level-item" @click="createUser()">
+                        Create User
+                    </button>
+                </div>
+            </article>
+            <template x-if="showNotification">
+                <div class="notification is-danger">
+                    <button class="delete" @click="closeNotification()"></button>
+                    <span x-text="notificationMessage"></span>
+                </div>
+            </template>
+        </div>
+    </div>
+</section>
+</body>
+<script>
+    async function postData(url = '', data = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    function page() {
+        return {
+            username: '',
+            name:'',
+            password: '',
+            confirmPassword: '',
+            showNotification: false,
+            notificationMessage:'',
+            closeNotification: function()
+            {
+                this.showNotification = false;
+            },
+            createUser: async function() {
+                if (this.username === '' || this.name ==='' || this.password === '')
+                {
+                    this.notificationMessage = 'Please enter username, name, and password.';
+                    this.showNotification = true;
+                    return;
+                }
+                if (this.password !== this.confirmPassword)
+                {
+                    this.notificationMessage = 'Passwords do not match.';
+                    this.showNotification = true;
+                    return;
+                }
+                const result = await postData('./createuser', {
+                    username: this.username,
+                    name: this.name,
+                    password: this.password
+                });
+                if (result && result.status !== 'success')
+                {
+                    this.notificationMessage = result.message;
+                    this.showNotification = true;
+                }
+                else
+                {
+                    window.location.href = './';
+                }
+            }
+        }
+    }
+</script>
+</html>

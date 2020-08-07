@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="XSS CTF">
+    <title>XSS CTF</title>
+    <link rel="stylesheet" href="./static/bulma.min.css">
+    <script src="./static/alpine.min.js" defer></script>
+    <style>
+        html {
+            background-color: lightgray;
+        }
+        .section {
+            padding: 0.5rem 1.5rem;
+        }
+        .pre-code {
+            padding: 0.5rem 0.5rem;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body x-data="page()">
+<nav class="level">
+    <div class="level-item">
+        <h1 class="title is-1">XSS Challenges</h1>
+    </div>
+</nav>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 1</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Hints: </b>innerHTML
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(1);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 2</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Notes: </b>Some strings are now forbidden, and will be removed from all posts.
+                </h4>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-full">
+                <b>Relevant Server Source Code</b>
+                <div>
+<pre style="color:#d1d1d1;background:#000000;"><span style="color:#e66170; font-weight:bold; ">function</span> sanitizePost<span style="color:#d2cd86; ">(</span>post<span style="color:#d2cd86; ">)</span>
+<span style="color:#b060b0; ">{</span>
+    <span style="color:#e66170; font-weight:bold; ">for</span> <span style="color:#d2cd86; ">(</span><span style="color:#e66170; font-weight:bold; ">let</span> word of EVIL_WORDS<span style="color:#d2cd86; ">)</span>
+    <span style="color:#b060b0; ">{</span>
+        <span style="color:#e66170; font-weight:bold; ">let</span> regex <span style="color:#d2cd86; ">=</span> <span style="color:#e66170; font-weight:bold; ">new</span> RegExp<span style="color:#d2cd86; ">(</span>word<span style="color:#d2cd86; ">,</span> <span style="color:#02d045; ">'</span><span style="color:#00c4c4; ">gi</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">)</span><span style="color:#b060b0; ">;</span>
+        post <span style="color:#d2cd86; ">=</span> post<span style="color:#d2cd86; ">.</span><span style="color:#e66170; font-weight:bold; ">replace</span><span style="color:#d2cd86; ">(</span>regex<span style="color:#d2cd86; ">,</span><span style="color:#02d045; ">'</span><span style="color:#02d045; ">'</span><span style="color:#d2cd86; ">)</span><span style="color:#b060b0; ">;</span>
+    <span style="color:#b060b0; ">}</span>
+    <span style="color:#e66170; font-weight:bold; ">return</span> post<span style="color:#b060b0; ">;</span>
+<span style="color:#b060b0; ">}</span>
+</pre>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(2);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 3</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Notes: </b>The previous issue with sanitizePost has been resolved!
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(3);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 4</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Notes: </b>Added more word restrictions.
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(4);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 5</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Notes: </b>Cookie httpOnly flag has been set.
+                    <br>
+                    <b>Hints: </b>Use the source, Luke.
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(5);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+<script>
+function page() {
+    return {
+        gotoLevel: function(level) {
+            window.open(`./level${level}`, '_blank');
+        }
+    }
+}
+</script>
+</html>

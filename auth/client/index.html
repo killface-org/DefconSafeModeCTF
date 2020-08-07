@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Authentication CTF">
+    <title>Authentication CTF</title>
+    <link rel="stylesheet" href="./static/bulma.min.css">
+    <script src="./static/alpine.min.js" defer></script>
+    <style>
+        html {
+            background-color: lightgray;
+        }
+        .section {
+            padding: 0.5rem 1.5rem;
+        }
+        .pre-code {
+            padding: 0.5rem 0.5rem;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body x-data="page()">
+<nav class="level">
+    <div class="level-item">
+        <h1 class="title is-1">Authentication Challenges</h1>
+    </div>
+</nav>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 1</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Hints: </b>A round sweet treat.
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(1);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 2</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Hints: </b>Potatoes can be prepared this way.
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(2);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 3</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Hints: </b>Information wrapped in squiggle symbols. Some arthropods make these. You can win them at Chuck-E-Cheese.
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(3);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 4</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Hints: </b>Most keyed locks use 5 pins of varying numerical length.
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(4);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="box">
+        <div class="columns">
+            <div class="column is-full">
+                <h2 class="title is-4">Challenge 5</h2>
+                <h4 class="subtitle is-6">
+                    <b>Task: </b>Access the win.html page.
+                    <br>
+                    <b>Hints: </b>Red herrings aren't afriad to fail in their bases.
+                </h4>
+            </div>
+        </div>
+        <div class="level">
+            <div class="level-item">
+                <button class="button is-info" @click="gotoLevel(5);">Goto Challenge</button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+<script>
+function page() {
+    return {
+        gotoLevel: function(level) {
+            window.open(`./level${level}`, '_blank');
+        }
+    }
+}
+</script>
+</html>
