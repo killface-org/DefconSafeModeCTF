@@ -9,7 +9,7 @@ function calcPostTime(length, hours)
     return (60*60*1000*hours)/length;
 }
 
-const DOMAIN = 'localhost';
+const DOMAIN = '10.0.3.222';
 const PORT = '8080';
 
 (async ()=> {

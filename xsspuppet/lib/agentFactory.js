@@ -3,7 +3,10 @@ const puppeteer = require('puppeteer');
 const TokenBuilder = require('./tokenBuilder.js');
 
 const PUPPETEER_LAUNCH_CONFIG = {
-    headless: true
+    headless: true,
+    //These options are needed to run puppeteer on alpine arm v7
+    executablePath: '/usr/bin/chromium-browser',
+    args:['--no-sandbox']
 };
 
 const launchBrowser = function()
